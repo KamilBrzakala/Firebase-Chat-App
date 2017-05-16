@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "149758163235",
+    "firebase_url": "https://mojprojekt-7207c.firebaseio.com",
+    "project_id": "mojprojekt-7207c",
+    "storage_bucket": "mojprojekt-7207c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:149758163235:android:d932814df8202bdd",
+        "android_client_info": {
+          "package_name": "com.example.prezes.messanger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "149758163235-habm99u9698aa7ve5djqkrkc03kpc63n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.prezes.messanger",
+            "certificate_hash": "367bdaf27567091be52b2ea94c258a99a25a425d"
+          }
+        },
+        {
+          "client_id": "149758163235-1e7knnr7b7c79deut5mr9o05a3chnm5n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFRnP1fLeglt4UjBSnqVB0UTYPaJgqCrM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "149758163235-1e7knnr7b7c79deut5mr9o05a3chnm5n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
