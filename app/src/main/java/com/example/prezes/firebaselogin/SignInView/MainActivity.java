@@ -5,14 +5,13 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.prezes.firebaselogin.R;
 import com.example.prezes.firebaselogin.SignedInUser.AccountActivity;
+import com.example.prezes.firebaselogin.SignedInUser.User;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -29,6 +28,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String TAG = "MainActivity";
     private static final int RC_SIGN_IN = 9001;
+
+    private FirebaseUser user;
 
     private DatabaseReference mDatabase;
     static ArrayList<String> userList = new ArrayList<>();
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         // Set login click listeners
         findViewById(R.id.googleBtn).setOnClickListener(this);
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     startActivity(new Intent(MainActivity.this, AccountActivity.class));
 
 
+                    onAuthSuccess(user.getUid(), user.getEmail(), user.getEmail());
 
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
@@ -76,8 +80,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
             }
-        };
 
+
+        };
 
         // [START config_signin]
         // Configure Google Sign In
@@ -95,7 +100,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    private void onAuthSuccess(String userId, String name, String email) {
 
+        String username = usernameFromEmail(email);
+//        String uid = usernameFromEmail(user.getUid());
+
+        // Write new user
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference();
+
+        User newUser = new User(username, email);
+        myRef.child("users").child(userId).setValue(newUser);
+       // writeNewUser(user.getUid(), username, user.getEmail());
+
+        finish();
+
+    }
+
+    private String usernameFromEmail(String email) {
+        if (email.contains("@")) {
+            return email.split("@")[0];
+        } else {
+            return email;
+        }
+    }
 
     // [START on_start_check_user]
     @Override
@@ -226,30 +254,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            revokeAccess();
 //        }
     }
-
-//    private void onAuthSuccess(FirebaseUser user) {
-//        String username = usernameFromEmail(user.getEmail());
-//
-//        // Write new user
-//        writeNewUser(user.getUid(), username, user.getEmail());
-//
-//        // Go to MainActivity
-//
-//    }
-//    private String usernameFromEmail(String email) {
-//        if (email.contains("@")) {
-//            return email.split("@")[0];
-//        } else {
-//            return email;
-//        }
-//    }
-//
-//    private void writeNewUser(String userId, String name, String email) {
-//        User user = new User(name, email);
-//
-//        mDatabase.child("users").child(userId).setValue(user);
-//        ArrayList<String> userNames = new ArrayList<>();
-//        userNames.add(name);
-//        mDatabase.child("usernamelist").setValue(userNames);
-//    }
 }
