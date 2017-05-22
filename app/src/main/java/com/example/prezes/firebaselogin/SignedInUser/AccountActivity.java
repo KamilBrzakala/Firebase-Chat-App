@@ -27,6 +27,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,13 +42,13 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
     private GoogleApiClient mGoogleApiClient;
-
+    private FirebaseUser user;
     private static final String TAG = "UserList" ;
     private DatabaseReference userlistReference;
     private ValueEventListener mUserListListener;
-    ArrayList<String> usernamelist = new ArrayList<>();
-    ArrayAdapter arrayAdapter;
 
+    ArrayList<String> usernameList = new ArrayList<>();
+    ArrayAdapter arrayAdapter;
     ListView userListView;
 
     @Override
@@ -55,10 +56,28 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
 
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("users");
+
+        userListView = (ListView) findViewById(R.id.userListView);
+
+        //User newUser = new User(username, email);
+        //usernameList.add(myRef.child("users").child(userId).get(newUser);
+
+        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, usernameList);
+
+        userListView.setAdapter(arrayAdapter);
+
+
         //Add toolbar
         Toolbar toolbar = (Toolbar)  findViewById(R.id.toolbar);
-        toolbar.setTitle("Frebase chat");
+        toolbar.setTitle("Contact List");
         setSupportActionBar(toolbar);
+
+        // [START initialize_database_ref]
+
+        // [END initialize_database_ref]
+        //myRef.setValue("Hello");
 
 
         mAuth = FirebaseAuth.getInstance();
