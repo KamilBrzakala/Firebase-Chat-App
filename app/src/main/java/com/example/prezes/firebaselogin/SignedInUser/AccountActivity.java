@@ -11,21 +11,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.prezes.firebaselogin.SignInView.MainActivity;
 import com.example.prezes.firebaselogin.R;
+import com.example.prezes.firebaselogin.model.User;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,6 +32,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import static com.example.prezes.firebaselogin.R.layout.activity_account;
 
 public class AccountActivity extends AppCompatActivity implements View.OnClickListener,GoogleApiClient.OnConnectionFailedListener {
 
@@ -42,43 +42,48 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
     private GoogleApiClient mGoogleApiClient;
-    private FirebaseUser user;
+
     private static final String TAG = "UserList" ;
-    private DatabaseReference userlistReference;
+
     private ValueEventListener mUserListListener;
 
-    ArrayList<String> usernameList = new ArrayList<>();
+    private FirebaseUser user;
+    DatabaseReference myRef;
+    FirebaseDatabase firebaseDatabase;
+
+    List<String> usernameList = new ArrayList<>();
     ArrayAdapter arrayAdapter;
     ListView userListView;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_account);
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("users");
+        setContentView(activity_account);
 
         userListView = (ListView) findViewById(R.id.userListView);
 
-        //User newUser = new User(username, email);
-        //usernameList.add(myRef.child("users").child(userId).get(newUser);
+        //Firebase
 
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, usernameList);
+        initFirebase();
+        addEventFirebaseListener();
+        //DatabaseReference myRef = database.getReference("users").child(user.getUid());
 
-        userListView.setAdapter(arrayAdapter);
+
+
+
+       // User newUser = new User();
+       // usernameList.add();
+
+        //arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, usernameList);
+
+        //userListView.setAdapter(arrayAdapter);
 
 
         //Add toolbar
         Toolbar toolbar = (Toolbar)  findViewById(R.id.toolbar);
         toolbar.setTitle("Contact List");
         setSupportActionBar(toolbar);
-
-        // [START initialize_database_ref]
-
-        // [END initialize_database_ref]
-        //myRef.setValue("Hello");
-
 
         mAuth = FirebaseAuth.getInstance();
         authStateListener = new FirebaseAuth.AuthStateListener() {
@@ -99,6 +104,41 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                 .build();
 
     }
+
+    private void initFirebase(){
+        FirebaseApp.initializeApp(this);
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        myRef = firebaseDatabase.getReference();
+
+    }
+
+    private void addEventFirebaseListener(){
+
+        myRef.child("users").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(usernameList.size() > 0){
+                    usernameList.clear();
+                }
+                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+                    User user = postSnapshot.getValue(User.class);
+
+                    String authorName = user.name;
+                    //User user =  postSnapshot.child("name").getValue();
+                    usernameList.add(authorName);
+                }
+                arrayAdapter = new ArrayAdapter(AccountActivity.this, android.R.layout.simple_list_item_1, usernameList);
+                userListView.setAdapter(arrayAdapter);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu,menu);

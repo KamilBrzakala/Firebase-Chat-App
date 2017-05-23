@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.example.prezes.firebaselogin.R;
 import com.example.prezes.firebaselogin.SignedInUser.AccountActivity;
-import com.example.prezes.firebaselogin.SignedInUser.User;
+import com.example.prezes.firebaselogin.model.User;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
