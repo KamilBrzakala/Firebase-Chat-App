@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.prezes.firebaselogin.SignInView.MainActivity;
@@ -32,7 +33,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.prezes.firebaselogin.R.layout.activity_account;
 
@@ -42,12 +45,13 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
     private GoogleApiClient mGoogleApiClient;
+    ProgressBar progressBar;
 
     private static final String TAG = "UserList" ;
 
     private ValueEventListener mUserListListener;
 
-    private FirebaseUser user;
+    private FirebaseUser currentUser;
     DatabaseReference myRef;
     FirebaseDatabase firebaseDatabase;
 
@@ -66,18 +70,11 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         //Firebase
 
         initFirebase();
-        addEventFirebaseListener();
-        //DatabaseReference myRef = database.getReference("users").child(user.getUid());
 
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        addEventFirebaseListener(currentUser);
 
-
-       // User newUser = new User();
-       // usernameList.add();
-
-        //arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, usernameList);
-
-        //userListView.setAdapter(arrayAdapter);
 
 
         //Add toolbar
@@ -112,23 +109,51 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    private void addEventFirebaseListener(){
+    private void addEventFirebaseListener(final FirebaseUser currentUser){
+
+        progressBar = (ProgressBar) findViewById(R.id.circular_progress);
+        progressBar.setVisibility(View.VISIBLE);
 
         myRef.child("users").addValueEventListener(new ValueEventListener() {
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
+                HashMap<String, Object> users = (HashMap<String, Object>) dataSnapshot.getValue();
+
                 if(usernameList.size() > 0){
                     usernameList.clear();
                 }
                 for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+//                    for(Object user : users.values()){
+//
+//                        HashMap<String, Object> userMap = (HashMap<String, Object>) user;
+//
+//                        String userNumber = (String) userMap.remove("userId");
+//
+//                    if(!usernameList.contains(userNumber)){
+//                        String name = (String) userMap.remove("name");
+//                        String email = (String) userMap.remove("email");
+//                        User info = new User(userNumber, name, email);
+//                        usernameList.add(info);
+//                    }
+
                     User user = postSnapshot.getValue(User.class);
 
                     String authorName = user.name;
-                    //User user =  postSnapshot.child("name").getValue();
                     usernameList.add(authorName);
+/*user.userId == currentUser.getUid()*/
+                   if(usernameList.contains(currentUser.getUid())){
+                       usernameList.remove(authorName);
+                   }
+
+                    progressBar.setVisibility(View.INVISIBLE);
+
+
                 }
                 arrayAdapter = new ArrayAdapter(AccountActivity.this, android.R.layout.simple_list_item_1, usernameList);
                 userListView.setAdapter(arrayAdapter);
+
 
             }
 
@@ -138,6 +163,9 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
     }
+
+
+
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
