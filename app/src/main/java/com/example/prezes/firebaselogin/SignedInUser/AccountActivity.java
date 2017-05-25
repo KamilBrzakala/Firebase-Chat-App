@@ -124,33 +124,24 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                 if(usernameList.size() > 0){
                     usernameList.clear();
                 }
-                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
-//                    for(Object user : users.values()){
-//
-//                        HashMap<String, Object> userMap = (HashMap<String, Object>) user;
-//
-//                        String userNumber = (String) userMap.remove("userId");
-//
-//                    if(!usernameList.contains(userNumber)){
-//                        String name = (String) userMap.remove("name");
-//                        String email = (String) userMap.remove("email");
-//                        User info = new User(userNumber, name, email);
-//                        usernameList.add(info);
-//                    }
 
-                    User user = postSnapshot.getValue(User.class);
+                    for(Object us : users.values()) {
+                        HashMap<String, Object> userMap = (HashMap<String, Object>) us;
 
-                    String authorName = user.name;
-                    usernameList.add(authorName);
-/*user.userId == currentUser.getUid()*/
-                   if(usernameList.contains(currentUser.getUid())){
-                       usernameList.remove(authorName);
-                   }
+                        String s = userMap.get("name").toString();
+                        String a = userMap.get("userId").toString();
+                        String b = currentUser.getUid();
+
+                        if(!a.equals(b)){
+
+                            usernameList.add(s);
+
+                        }
+
+                    }
 
                     progressBar.setVisibility(View.INVISIBLE);
 
-
-                }
                 arrayAdapter = new ArrayAdapter(AccountActivity.this, android.R.layout.simple_list_item_1, usernameList);
                 userListView.setAdapter(arrayAdapter);
 
