@@ -4,25 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.prezes.firebaselogin.SignedInUserActivity.AccountActivity">
+    tools:context="com.example.prezes.firebaselogin.SignedIn.ContactListActivity">
 
-<android.support.v7.widget.Toolbar
-    android:id="@+id/toolbar"
-    android:minHeight="?attr/actionBarSize"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?attr/colorPrimary"
-    app:titleTextColor="@android:color/white"
-    />
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:minHeight="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        app:titleTextColor="@android:color/white"
+        />
 
     <ListView
-        android:id="@+id/userListView"
+        android:id="@+id/userListView2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/toolbar" />
-    
+
     <ProgressBar
         android:id="@+id/circular_progress"
         android:visibility="invisible"

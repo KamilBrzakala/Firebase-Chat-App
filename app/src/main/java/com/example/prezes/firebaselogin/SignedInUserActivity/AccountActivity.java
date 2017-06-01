@@ -1,4 +1,4 @@
-package com.example.prezes.firebaselogin.SignedInUser;
+package com.example.prezes.firebaselogin.SignedInUserActivity;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -10,14 +10,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.prezes.firebaselogin.SignInView.MainActivity;
+import com.example.prezes.firebaselogin.ChatActivity.ChatActivity;
+import com.example.prezes.firebaselogin.SignInActivity.MainActivity;
 import com.example.prezes.firebaselogin.R;
-import com.example.prezes.firebaselogin.model.User;
+import com.example.prezes.firebaselogin.SignedIn.ContactListActivity;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -35,7 +37,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 import static com.example.prezes.firebaselogin.R.layout.activity_account;
 
@@ -71,15 +72,31 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
         initFirebase();
 
+        //getting current logged user
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        //populating list of users
         addEventFirebaseListener(currentUser);
 
+       // onClickListener(userListView);
+
+        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                startActivity(new Intent(AccountActivity.this, ChatActivity.class));
+
+               // Intent intent = new Intent(AccountActivity.this, ChatActivity.class);
+                //intent.putExtra("userName", usernameList.get(position));
+               // startActivity(intent);
+
+            }
+        });
 
 
         //Add toolbar
         Toolbar toolbar = (Toolbar)  findViewById(R.id.toolbar);
-        toolbar.setTitle("Contact List");
+        toolbar.setTitle("Chat");
         setSupportActionBar(toolbar);
 
         mAuth = FirebaseAuth.getInstance();
@@ -109,6 +126,21 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
+    private void onClickListener(ListView userListView){
+
+        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                intent.putExtra("userName", usernameList.get(position));
+                startActivity(intent);
+
+            }
+        });
+
+    }
+
     private void addEventFirebaseListener(final FirebaseUser currentUser){
 
         progressBar = (ProgressBar) findViewById(R.id.circular_progress);
@@ -125,26 +157,23 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                     usernameList.clear();
                 }
 
-                    for(Object us : users.values()) {
-                        HashMap<String, Object> userMap = (HashMap<String, Object>) us;
+                    for(Object user : users.values()) {
+                        HashMap<String, Object> userMap = (HashMap<String, Object>) user;
 
-                        String s = userMap.get("name").toString();
-                        String a = userMap.get("userId").toString();
-                        String b = currentUser.getUid();
+                        String userName = userMap.get("name").toString();
+                        String userID = userMap.get("userId").toString();
+                        String loggedUserId = currentUser.getUid();
 
-                        if(!a.equals(b)){
-
-                            usernameList.add(s);
-
+                        if(!userID.equals(loggedUserId)){
+                            usernameList.add(userName);
                         }
-
                     }
 
-                    progressBar.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
 
                 arrayAdapter = new ArrayAdapter(AccountActivity.this, android.R.layout.simple_list_item_1, usernameList);
                 userListView.setAdapter(arrayAdapter);
-
+                arrayAdapter.notifyDataSetChanged();
 
             }
 
@@ -170,6 +199,14 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
             signOut();
             mAuth.signOut();
+
+            return true;
+        }
+
+        if(id == R.id.menuAdd){
+
+            Intent intent = new Intent(AccountActivity.this, ContactListActivity.class);
+            startActivity(intent);
 
             return true;
         }

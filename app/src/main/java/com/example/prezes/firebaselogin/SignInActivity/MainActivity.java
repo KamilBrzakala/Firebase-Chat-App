@@ -1,4 +1,4 @@
-package com.example.prezes.firebaselogin.SignInView;
+package com.example.prezes.firebaselogin.SignInActivity;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -10,7 +10,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.prezes.firebaselogin.R;
-import com.example.prezes.firebaselogin.SignedInUser.AccountActivity;
+import com.example.prezes.firebaselogin.SignedInUserActivity.AccountActivity;
 import com.example.prezes.firebaselogin.model.User;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
