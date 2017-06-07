@@ -4,18 +4,18 @@ package com.example.prezes.firebaselogin.model;
  * Created by prezes on 2017-05-22.
  */
 
-public class Chat {
+public class Message {
     private String mName;
-    private String mMessage;
+    private String mText;
     private String mUid;
 
-    public Chat() {
-        // Needed for Firebase
+    public Message() {
+        // Default constructor required for calls to DataSnapshot.getValue(Comment.class)
     }
 
-    public Chat(String name, String message, String uid) {
+    public Message(String uid,  String text, String name ) {
         mName = name;
-        mMessage = message;
+        mText = text;
         mUid = uid;
     }
 
@@ -27,12 +27,12 @@ public class Chat {
         mName = name;
     }
 
-    public String getMessage() {
-        return mMessage;
+    public String getText() {
+        return mText;
     }
 
-    public void setMessage(String message) {
-        mMessage = message;
+    public void setText(String mText) {
+        this.mText = mText;
     }
 
     public String getUid() {

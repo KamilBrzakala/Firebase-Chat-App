@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.prezes.firebaselogin.ChatActivity.ChatActivity;
@@ -36,7 +37,7 @@ import java.util.List;
 
 import static com.example.prezes.firebaselogin.R.id.userListView;
 
-public class ContactListActivity extends AppCompatActivity /*implements GoogleApiClient.OnConnectionFailedListener */{
+public class ContactListActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
@@ -55,6 +56,10 @@ public class ContactListActivity extends AppCompatActivity /*implements GoogleAp
     ArrayAdapter arrayAdapter2;
     ListView userListView2;
     private FirebaseAuth firebaseAuth;
+
+    String userName;
+    String userID;
+    String loggedUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,40 +84,28 @@ public class ContactListActivity extends AppCompatActivity /*implements GoogleAp
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         //populating list of users
-//        addEventFirebaseListener(currentUser);
-//
-//        // onClickListener(userListView);
-//
-//        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//                startActivity(new Intent(ContactListActivity.this, ChatActivity.class));
-//
-//                // Intent intent = new Intent(AccountActivity.this, ChatActivity.class);
-//                //intent.putExtra("userName", usernameList.get(position));
-//                // startActivity(intent);
-//
-//            }
-//        });
-//
-//        mAuth = FirebaseAuth.getInstance();
-//        authStateListener = new FirebaseAuth.AuthStateListener() {
-//            @Override
-//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-//
-//                if (firebaseAuth.getCurrentUser() == null) {
-//
-//                    startActivity(new Intent(ContactListActivity.this, MainActivity.class));
-//
-//                }
-//            }
-//        };
-//
-//        mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-//                .addApi(Auth.GOOGLE_SIGN_IN_API)
-//                .build();
+        addEventFirebaseListener(currentUser);
+
+        onClickListener(userListView2);
+
+
+        mAuth = FirebaseAuth.getInstance();
+        authStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+                if (firebaseAuth.getCurrentUser() == null) {
+
+                    startActivity(new Intent(ContactListActivity.this, MainActivity.class));
+
+                }
+            }
+        };
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API)
+                .build();
 
     }
 
@@ -124,63 +117,70 @@ public class ContactListActivity extends AppCompatActivity /*implements GoogleAp
 
     }
 
-//    private void onClickListener(ListView userListView){
-//
-//        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-//                intent.putExtra("userName", usernameList.get(position));
-//                startActivity(intent);
-//
-//            }
-//        });
-//
-//    }
-//
-//    private void addEventFirebaseListener(final FirebaseUser currentUser){
-//
-//        progressBar = (ProgressBar) findViewById(R.id.circular_progress);
-//        progressBar.setVisibility(View.VISIBLE);
-//
-//        myRef.child("users").addValueEventListener(new ValueEventListener() {
-//
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                HashMap<String, Object> users = (HashMap<String, Object>) dataSnapshot.getValue();
-//
-//                if(usernameList.size() > 0){
-//                    usernameList.clear();
-//                }
-//
-//                for(Object user : users.values()) {
-//                    HashMap<String, Object> userMap = (HashMap<String, Object>) user;
-//
-//                    String userName = userMap.get("name").toString();
-//                    String userID = userMap.get("userId").toString();
-//                    String loggedUserId = currentUser.getUid();
-//
-//                    if(!userID.equals(loggedUserId)){
-//                        usernameList.add(userName);
-//                    }
-//                }
-//
-//                progressBar.setVisibility(View.INVISIBLE);
-//
-//                arrayAdapter2 = new ArrayAdapter(ContactListActivity.this, android.R.layout.simple_list_item_1, usernameList2);
-//                userListView2.setAdapter(arrayAdapter2);
-//                arrayAdapter2.notifyDataSetChanged();
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//    }
+    private void onClickListener(final ListView userListView2){
+
+        userListView2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Intent intent = new Intent(ContactListActivity.this, ChatActivity.class);
+
+                // selected item
+                String selectedFromList =(String) (userListView2.getItemAtPosition(position));
+
+                intent.putExtra("text", selectedFromList);
+
+                startActivity(intent);
+
+            }
+        });
+
+    }
+
+    private void addEventFirebaseListener(final FirebaseUser currentUser){
+
+        progressBar = (ProgressBar) findViewById(R.id.circular_progress);
+        progressBar.setVisibility(View.VISIBLE);
+
+        myRef.child("users").addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                HashMap<String, Object> users = (HashMap<String, Object>) dataSnapshot.getValue();
+
+                if(usernameList2.size() > 0){
+                    usernameList2.clear();
+                }
+
+                for(Object user : users.values()) {
+                    HashMap<String, Object> userMap = (HashMap<String, Object>) user;
+
+                    userName = userMap.get("name").toString();
+                    userID = userMap.get("userId").toString();
+                    loggedUserId = currentUser.getUid();
+
+                    if(!userID.equals(loggedUserId)){
+                        usernameList2.add(userName);
+                    }
+                }
+
+                progressBar.setVisibility(View.INVISIBLE);
+
+                arrayAdapter2 = new ArrayAdapter(ContactListActivity.this, android.R.layout.simple_list_item_1, usernameList2);
+                userListView2.setAdapter(arrayAdapter2);
+                arrayAdapter2.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
 
 //
 //    @Override
@@ -191,10 +191,10 @@ public class ContactListActivity extends AppCompatActivity /*implements GoogleAp
 //        mGoogleApiClient.connect();
 //
 //    }
-//
-//
-//    @Override
-//    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-//        Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
-//    }
+
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+    }
 }

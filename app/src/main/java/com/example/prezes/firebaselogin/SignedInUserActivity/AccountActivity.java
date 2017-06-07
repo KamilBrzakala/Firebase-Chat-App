@@ -2,6 +2,8 @@ package com.example.prezes.firebaselogin.SignedInUserActivity;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -66,6 +68,21 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(activity_account);
 
+        //Add toolbar
+        Toolbar toolbar = (Toolbar)  findViewById(R.id.toolbar);
+        toolbar.setTitle("Chat");
+        setSupportActionBar(toolbar);
+
+        //Add new message button
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.NewMessageButton);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(AccountActivity.this, ContactListActivity.class));
+            }
+        });
+
+        //calling list view
         userListView = (ListView) findViewById(R.id.userListView);
 
         //Firebase
@@ -76,29 +93,12 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         //populating list of users
-        addEventFirebaseListener(currentUser);
+      //  addEventFirebaseListener(currentUser);
 
-       // onClickListener(userListView);
+        //clicking specific user from list
+        onClickListener(userListView);
 
-        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                startActivity(new Intent(AccountActivity.this, ChatActivity.class));
-
-               // Intent intent = new Intent(AccountActivity.this, ChatActivity.class);
-                //intent.putExtra("userName", usernameList.get(position));
-               // startActivity(intent);
-
-            }
-        });
-
-
-        //Add toolbar
-        Toolbar toolbar = (Toolbar)  findViewById(R.id.toolbar);
-        toolbar.setTitle("Chat");
-        setSupportActionBar(toolbar);
-
+        //checking currently logged user
         mAuth = FirebaseAuth.getInstance();
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -199,14 +199,6 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
             signOut();
             mAuth.signOut();
-
-            return true;
-        }
-
-        if(id == R.id.menuAdd){
-
-            Intent intent = new Intent(AccountActivity.this, ContactListActivity.class);
-            startActivity(intent);
 
             return true;
         }

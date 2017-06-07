@@ -1,0 +1,16 @@
+Index: app/src/main/java/com/example/prezes/firebaselogin/SignInView/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/prezes/firebaselogin/SignInView/MainActivity.java	(revision )
++++ app/src/main/java/com/example/prezes/firebaselogin/SignInView/MainActivity.java	(revision )
+@@ -113,6 +113,7 @@
+         myRef.child("users").child(userId).setValue(newUser);
+        // writeNewUser(user.getUid(), username, user.getEmail());
+ 
++        finish();
+ 
+     }
+ 
+\ No newline at end of file

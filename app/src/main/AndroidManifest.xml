@@ -27,6 +27,7 @@
         <activity android:name=".SignedInUserActivity.AccountActivity" />
         <activity
             android:name=".ChatActivity.ChatActivity"
+            android:windowSoftInputMode="adjustPan"
             android:label="@string/title_activity_chat"
             android:parentActivityName=".SignedInUserActivity.AccountActivity"
             android:theme="@style/AppTheme">
@@ -43,6 +44,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.prezes.firebaselogin.SignedInUserActivity.AccountActivity" />
         </activity>
+
     </application>
 
 </manifest>
