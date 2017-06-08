@@ -109,8 +109,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference();
 
-        User newUser = new User(userId, username, email);
-        myRef.child("users").child(userId).setValue(newUser);
+        User newUser = new User(username, username, email);
+        myRef.child("users").child(username).setValue(newUser);
        // writeNewUser(user.getUid(), username, user.getEmail());
 
         finish();

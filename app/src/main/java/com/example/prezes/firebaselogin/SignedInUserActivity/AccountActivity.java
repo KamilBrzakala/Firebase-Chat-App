@@ -3,7 +3,6 @@ package com.example.prezes.firebaselogin.SignedInUserActivity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.prezes.firebaselogin.ChatActivity.ChatActivity;
@@ -49,7 +49,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
     private FirebaseAuth.AuthStateListener authStateListener;
     private GoogleApiClient mGoogleApiClient;
     ProgressBar progressBar;
-
+    TextView noUsersText;
     private static final String TAG = "UserList" ;
 
     private ValueEventListener mUserListListener;
@@ -60,7 +60,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
     List<String> usernameList = new ArrayList<>();
     ArrayAdapter arrayAdapter;
-    ListView userListView;
+    ListView msgListView;
     private FirebaseAuth firebaseAuth;
 
     @Override
@@ -83,8 +83,8 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         });
 
         //calling list view
-        userListView = (ListView) findViewById(R.id.userListView);
-
+        msgListView = (ListView) findViewById(R.id.userListView);
+        noUsersText = (TextView)findViewById(R.id.noUsersText);
         //Firebase
 
         initFirebase();
@@ -96,7 +96,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
       //  addEventFirebaseListener(currentUser);
 
         //clicking specific user from list
-        onClickListener(userListView);
+        onClickListener(msgListView);
 
         //checking currently logged user
         mAuth = FirebaseAuth.getInstance();
@@ -116,6 +116,16 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API)
                 .build();
+
+        if(usernameList.isEmpty()){
+            noUsersText.setVisibility(View.VISIBLE);
+            msgListView.setVisibility(View.GONE);
+        }
+        else{
+            noUsersText.setVisibility(View.GONE);
+            msgListView.setVisibility(View.VISIBLE);
+            msgListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, usernameList));
+        }
 
     }
 
@@ -172,7 +182,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                 progressBar.setVisibility(View.INVISIBLE);
 
                 arrayAdapter = new ArrayAdapter(AccountActivity.this, android.R.layout.simple_list_item_1, usernameList);
-                userListView.setAdapter(arrayAdapter);
+                msgListView.setAdapter(arrayAdapter);
                 arrayAdapter.notifyDataSetChanged();
 
             }

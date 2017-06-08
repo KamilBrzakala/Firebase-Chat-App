@@ -15,6 +15,14 @@
     app:titleTextColor="@android:color/white"
     />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No users found!"
+        android:id="@+id/noUsersText"
+        android:visibility="gone"
+        android:layout_below="@+id/toolbar"/>
+
     <ListView
         android:id="@+id/userListView"
         android:layout_width="match_parent"

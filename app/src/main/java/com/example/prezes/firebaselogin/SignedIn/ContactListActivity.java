@@ -3,8 +3,6 @@ package com.example.prezes.firebaselogin.SignedIn;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -12,13 +10,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.prezes.firebaselogin.ChatActivity.ChatActivity;
 import com.example.prezes.firebaselogin.R;
 import com.example.prezes.firebaselogin.SignInActivity.MainActivity;
-import com.example.prezes.firebaselogin.SignedInUserActivity.AccountActivity;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -34,8 +30,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import static com.example.prezes.firebaselogin.R.id.userListView;
 
 public class ContactListActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -54,7 +48,7 @@ public class ContactListActivity extends AppCompatActivity implements GoogleApiC
 
     List<String> usernameList2 = new ArrayList<>();
     ArrayAdapter arrayAdapter2;
-    ListView userListView2;
+    ListView ContactListView;
     private FirebaseAuth firebaseAuth;
 
     String userName;
@@ -71,10 +65,7 @@ public class ContactListActivity extends AppCompatActivity implements GoogleApiC
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        userListView2 = (ListView) findViewById(R.id.userListView2);
-        usernameList2.add("aa");
-
-
+        ContactListView = (ListView) findViewById(R.id.ContactListView);
 
         //Firebase
 
@@ -86,7 +77,7 @@ public class ContactListActivity extends AppCompatActivity implements GoogleApiC
         //populating list of users
         addEventFirebaseListener(currentUser);
 
-        onClickListener(userListView2);
+        onClickListener(ContactListView);
 
 
         mAuth = FirebaseAuth.getInstance();
@@ -117,16 +108,16 @@ public class ContactListActivity extends AppCompatActivity implements GoogleApiC
 
     }
 
-    private void onClickListener(final ListView userListView2){
+    private void onClickListener(final ListView ContactListView){
 
-        userListView2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        ContactListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 Intent intent = new Intent(ContactListActivity.this, ChatActivity.class);
 
                 // selected item
-                String selectedFromList =(String) (userListView2.getItemAtPosition(position));
+                String selectedFromList =(String) (ContactListView.getItemAtPosition(position));
 
                 intent.putExtra("text", selectedFromList);
 
@@ -158,9 +149,10 @@ public class ContactListActivity extends AppCompatActivity implements GoogleApiC
 
                     userName = userMap.get("name").toString();
                     userID = userMap.get("userId").toString();
-                    loggedUserId = currentUser.getUid();
+                    loggedUserId = currentUser.getEmail();
+                    String username = usernameFromEmail(loggedUserId);
 
-                    if(!userID.equals(loggedUserId)){
+                    if(!userName.equals(username)){
                         usernameList2.add(userName);
                     }
                 }
@@ -168,7 +160,8 @@ public class ContactListActivity extends AppCompatActivity implements GoogleApiC
                 progressBar.setVisibility(View.INVISIBLE);
 
                 arrayAdapter2 = new ArrayAdapter(ContactListActivity.this, android.R.layout.simple_list_item_1, usernameList2);
-                userListView2.setAdapter(arrayAdapter2);
+                ContactListView.setAdapter(arrayAdapter2);
+                ContactListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
                 arrayAdapter2.notifyDataSetChanged();
 
             }
@@ -180,6 +173,13 @@ public class ContactListActivity extends AppCompatActivity implements GoogleApiC
         });
     }
 
+    private String usernameFromEmail(String email) {
+        if (email.contains("@")) {
+            return email.split("@")[0];
+        } else {
+            return email;
+        }
+    }
 
 
 //
