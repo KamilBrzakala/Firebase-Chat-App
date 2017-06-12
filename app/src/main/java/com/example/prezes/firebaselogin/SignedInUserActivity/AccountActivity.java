@@ -108,6 +108,16 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
                     startActivity(new Intent(AccountActivity.this, MainActivity.class));
 
+                } else {
+                    // User is already signed in. Therefore, display
+                    // a welcome Toast
+                    Toast.makeText(AccountActivity.this,
+                            "Welcome " + FirebaseAuth.getInstance()
+                                    .getCurrentUser()
+                                    .getDisplayName(),
+                            Toast.LENGTH_LONG)
+                            .show();
+
                 }
             }
         };

@@ -15,8 +15,6 @@ import android.widget.Toast;
 import com.example.prezes.firebaselogin.ChatActivity.ChatActivity;
 import com.example.prezes.firebaselogin.R;
 import com.example.prezes.firebaselogin.SignInActivity.MainActivity;
-import com.example.prezes.firebaselogin.model.ChatMessage;
-import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -39,7 +37,7 @@ public class ContactListActivity extends AppCompatActivity implements GoogleApiC
     private FirebaseAuth.AuthStateListener authStateListener;
     private GoogleApiClient mGoogleApiClient;
     ProgressBar progressBar;
-    private FirebaseListAdapter<ChatMessage> adapter;
+
     private static final String TAG = "UserList" ;
 
     private ValueEventListener mUserListListener;

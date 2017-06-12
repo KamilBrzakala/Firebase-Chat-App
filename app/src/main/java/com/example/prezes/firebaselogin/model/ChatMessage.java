@@ -1,25 +1,55 @@
 package com.example.prezes.firebaselogin.model;
 
-/**
- * Created by prezes on 2017-05-22.
- */
+import java.util.Date;
 
 public class ChatMessage {
 
-    public String message, sender, receiver, title;
+    private String messageText;
+    private String receiver;
+    private String sender;
+    private long messageTime;
 
-
-    public ChatMessage() {
-        // Default constructor required for calls to DataSnapshot.getValue(Comment.class)
+    public ChatMessage(String messageText, String receiver, String sender) {
+        this.messageText = messageText;
+        this.receiver = receiver;
+        this.sender = sender;
+        // Initialize to current time
+        messageTime = new Date().getTime();
     }
 
-    public ChatMessage(String Sender, String Receiver, String Message, String Title) {
-
-        message = Message;
-        sender = Sender;
-        receiver = Receiver;
-        title = Title;
+    public ChatMessage(){
 
     }
 
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public String getMessageText() {
+        return messageText;
+    }
+
+    public void setMessageText(String messageText) {
+        this.messageText = messageText;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
+    }
+
+    public long getMessageTime() {
+        return messageTime;
+    }
+
+    public void setMessageTime(long messageTime) {
+        this.messageTime = messageTime;
+    }
 }

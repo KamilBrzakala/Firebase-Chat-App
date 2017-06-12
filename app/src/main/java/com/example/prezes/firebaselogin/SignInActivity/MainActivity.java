@@ -149,6 +149,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
                 Toast.makeText(MainActivity.this, "Poszło", Toast.LENGTH_LONG).show();
+//                Toast.makeText(this,
+//                        "Welcome " + FirebaseAuth.getInstance()
+//                                .getCurrentUser()
+//                                .getDisplayName(),
+//                        Toast.LENGTH_LONG)
+//                        .show();
             } else {
                 // Google Sign In failed, update UI appropriately
                 // [START_EXCLUDE]

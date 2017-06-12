@@ -1,14 +1,15 @@
 package com.example.prezes.firebaselogin.ChatActivity;
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -18,12 +19,11 @@ import android.widget.TextView;
 import com.example.prezes.firebaselogin.R;
 import com.example.prezes.firebaselogin.model.ChatMessage;
 import com.example.prezes.firebaselogin.model.User;
+import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -34,8 +34,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     LinearLayout layout;
     RelativeLayout layout_2;
-    ImageView sendButton;
-    EditText messageArea;
+    FloatingActionButton sendButton;
+    EditText input;
     ScrollView scrollView;
     private DatabaseReference reference1, reference2;
 
@@ -43,11 +43,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseUser currentUser;
     FirebaseDatabase firebaseDatabase;
+    private FirebaseListAdapter<ChatMessage> adapter;
 
     private FirebaseAuth mAuth;
 
     public static ArrayList<ChatMessage> chatList = new ArrayList<>();
-    ListView msgListView;
+    ListView listOfMessages;
     private ChatMessage message;
     ArrayAdapter arrayAdapter;
     User user;
@@ -63,10 +64,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         toolbar.setTitle(receiver);
         setSupportActionBar(toolbar);
 
-        layout = (LinearLayout) findViewById(R.id.layout1);
-        layout_2 = (RelativeLayout)findViewById(R.id.layout2);
-        sendButton = (ImageView)findViewById(R.id.sendButton);
-        messageArea = (EditText)findViewById(R.id.messageArea);
+//        layout = (LinearLayout) findViewById(R.id.layout1);
+        listOfMessages = (ListView) findViewById(R.id.list_of_messages);
+        sendButton = (FloatingActionButton)findViewById(R.id.fab);
+        input = (EditText)findViewById(R.id.input);
         scrollView = (ScrollView)findViewById(R.id.scrollView);
 
         FirebaseApp.initializeApp(this);
@@ -85,56 +86,111 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String messageText = messageArea.getText().toString();
+                String messageText = input.getText().toString();
 
                 if(!messageText.equals("")){
-//                    Map<String, String> map = new HashMap<String, String>();
-//                    map.put("message", messageText);
-//                    map.put("sender", User.name );
-                    ChatMessage chatMessage = new ChatMessage( sender,  receiver,  messageText, receiver);
-                    reference1.child("message").child(receiver).push().setValue(chatMessage);
-//                    reference1.child("message").child(receiver).push().setValue(map);
-                    //reference1.push().setValue(map);
-                    messageArea.setText("");
+//                    ChatMessage chatMessage = new ChatMessage(messageText, receiver);
+//                    reference1.child("message").child(sender).push().setValue(chatMessage);
+
+                    reference1.child("messages").push().setValue(new ChatMessage(messageText,receiver, sender));
+                    input.setText("");
                 }
             }
         });
 
-        reference1.child("message").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                //Map map = dataSnapshot.getValue(Map.class);
-//                Map<String, String> map = (Map<String, String>) dataSnapshot.getValue();
-//                String message = map.get("message").toString();
-//                String userName = map.get("user").toString();
+        displayChatMessages();
+
+
+//        reference1.child("message").addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                //Map map = dataSnapshot.getValue(Map.class);
+////                Map<String, String> map = (Map<String, String>) dataSnapshot.getValue();
+////                String message = map.get("message").toString();
+////                String userName = map.get("user").toString();
+////
+////                if(userName.equals(User.name)){
+////                    addMessageBox("You:-\n" + message, 1);
+////                } else {
+////                    addMessageBox(User.chatWith  + ":-\n" + message, 2);
+////                }
+//            }
 //
-//                if(userName.equals(User.name)){
-//                    addMessageBox("You:-\n" + message, 1);
-//                } else {
-//                    addMessageBox(User.chatWith  + ":-\n" + message, 2);
-//                }
-            }
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
 
+    }
+
+    private void displayChatMessages() {
+//        ListView listOfMessages = (ListView) findViewById(R.id.list_of_messages);
+
+        adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class,
+                R.layout.message_area, FirebaseDatabase.getInstance().getReference().child("messages")) {
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            protected void populateView(View v, ChatMessage model, int position) {
 
+                if((model.getSender().equals(receiver) && model.getReceiver().equals(sender)) ||
+                        (model.getSender().equals(sender) && model.getReceiver().equals(receiver))
+                        ) {
+                    // Get references to the views of message.xml
+                    TextView messageText = (TextView) v.findViewById(R.id.message_text);
+                    TextView messageUser = (TextView) v.findViewById(R.id.message_user);
+                    TextView messageTime = (TextView) v.findViewById(R.id.message_time);
+
+                    // Set their text
+                    messageText.setText(model.getMessageText());
+                    messageUser.setText(model.getSender());
+
+                    // Format the date before showing it
+                    messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
+                            model.getMessageTime()));
+                }
             }
+        };
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+        listOfMessages.setAdapter(adapter);
 
-            }
+//        adapter.registerDataSetObserver(new DataSetObserver() {
+//            @Override
+//            public void onChanged() {
+//                super.onChanged();
+//                listOfMessages.setSelection(adapter.getCount() - 1);
+//            }
+//        });
+    }
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        adapter.cleanup();
+    }
 
-            }
+    private void showData(DataSnapshot dataSnapshot){
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+        for(DataSnapshot ds : dataSnapshot.getChildren()){
+            ChatMessage cMessage = new ChatMessage();
+          //  cMessage.setReceiver(ds.child(receiver).getValue(ChatMessage.class).getReceiver());
 
-            }
-        });
+         //   System.out.println("receiver " + cMessage.getReceiver());
+        }
 
     }
 
@@ -170,7 +226,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
 
-        if (v.getId() == R.id.sendButton) {
+        if (v.getId() == R.id.fab) {
         }
 
     }
