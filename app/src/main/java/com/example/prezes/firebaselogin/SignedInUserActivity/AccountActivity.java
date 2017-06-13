@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +23,8 @@ import com.example.prezes.firebaselogin.ChatActivity.ChatActivity;
 import com.example.prezes.firebaselogin.SignInActivity.MainActivity;
 import com.example.prezes.firebaselogin.R;
 import com.example.prezes.firebaselogin.SignedIn.ContactListActivity;
+import com.example.prezes.firebaselogin.model.ChatMessage;
+import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -51,6 +54,10 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
     ProgressBar progressBar;
     TextView noUsersText;
     private static final String TAG = "UserList" ;
+    private String receiver;
+    private String loggedUserId;
+    private String sender;
+
 
     private ValueEventListener mUserListListener;
 
@@ -59,6 +66,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
     FirebaseDatabase firebaseDatabase;
 
     List<String> usernameList = new ArrayList<>();
+    private FirebaseListAdapter<ChatMessage> adapter;
     ArrayAdapter arrayAdapter;
     ListView msgListView;
     private FirebaseAuth firebaseAuth;
@@ -72,6 +80,9 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         Toolbar toolbar = (Toolbar)  findViewById(R.id.toolbar);
         toolbar.setTitle("Chat");
         setSupportActionBar(toolbar);
+
+        receiver = getIntent().getStringExtra("receiver");
+
 
         //Add new message button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.NewMessageButton);
@@ -91,6 +102,8 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
         //getting current logged user
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        loggedUserId = currentUser.getEmail();
+        sender = usernameFromEmail(loggedUserId);
 
         //populating list of users
       //  addEventFirebaseListener(currentUser);
@@ -127,15 +140,17 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                 .addApi(Auth.GOOGLE_SIGN_IN_API)
                 .build();
 
-        if(usernameList.isEmpty()){
-            noUsersText.setVisibility(View.VISIBLE);
-            msgListView.setVisibility(View.GONE);
-        }
-        else{
-            noUsersText.setVisibility(View.GONE);
-            msgListView.setVisibility(View.VISIBLE);
-            msgListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, usernameList));
-        }
+  //      displayChatMessages();
+//
+//        if(usernameList.isEmpty()){
+//            noUsersText.setVisibility(View.VISIBLE);
+//            msgListView.setVisibility(View.GONE);
+//        }
+//        else{
+//            noUsersText.setVisibility(View.GONE);
+//            msgListView.setVisibility(View.VISIBLE);
+//            msgListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, usernameList));
+//        }
 
     }
 
@@ -158,6 +173,24 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
             }
         });
+
+    }
+
+    private void displayChatMessages() {
+
+        adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class,
+                R.layout.activity_account, FirebaseDatabase.getInstance().getReference().child("messages").child(sender+"_"+receiver)) {
+            @Override
+            protected void populateView(View v, ChatMessage model, int position) {
+
+                TextView noUsersText = (TextView) v.findViewById(R.id.noUsersText);
+                noUsersText.setText(model.getReceiver());
+
+
+            }
+        };
+
+        msgListView.setAdapter(adapter);
 
     }
 
@@ -253,13 +286,21 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
+    private String usernameFromEmail(String email) {
+        if (email.contains("@")) {
+            return email.split("@")[0];
+        } else {
+            return email;
+        }
+    }
+
     private void signOut() {
 
         // Google sign out
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
             @Override
             public void onResult(@NonNull Status status) {
-                Log.i("Sds","asdfs");
+
             }
         });
     }

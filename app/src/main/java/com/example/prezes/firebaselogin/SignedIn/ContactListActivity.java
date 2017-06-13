@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.example.prezes.firebaselogin.ChatActivity.ChatActivity;
 import com.example.prezes.firebaselogin.R;
 import com.example.prezes.firebaselogin.SignInActivity.MainActivity;
+import com.example.prezes.firebaselogin.SignedInUserActivity.AccountActivity;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -77,6 +78,7 @@ public class ContactListActivity extends AppCompatActivity implements GoogleApiC
         //populating list of users
         addEventFirebaseListener(currentUser);
 
+        //start chat by clicking particular user on the list
         onClickListener(ContactListView);
 
 
@@ -115,13 +117,16 @@ public class ContactListActivity extends AppCompatActivity implements GoogleApiC
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 Intent intent = new Intent(ContactListActivity.this, ChatActivity.class);
+           //     Intent intent2 = new Intent(ContactListActivity.this, AccountActivity.class);
 
                 // selected item
                 String selectedFromList =(String) (ContactListView.getItemAtPosition(position));
 
                 intent.putExtra("text", selectedFromList);
+             //   intent2.putExtra("receiver", selectedFromList);
 
                 startActivity(intent);
+             //   startActivity(intent2);
 
             }
         });
