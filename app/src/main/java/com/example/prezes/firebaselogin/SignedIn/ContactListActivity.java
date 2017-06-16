@@ -55,6 +55,7 @@ public class ContactListActivity extends AppCompatActivity implements GoogleApiC
     String userName;
     String userID;
     String loggedUserId;
+    String selectedFromList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +81,10 @@ public class ContactListActivity extends AppCompatActivity implements GoogleApiC
 
         //start chat by clicking particular user on the list
         onClickListener(ContactListView);
-
+//
+//            Intent intent2 = new Intent(ContactListActivity.this, AccountActivity.class);
+//           intent2.putExtra("receiver", selectedFromList);
+//           startActivity(intent2);
 
         mAuth = FirebaseAuth.getInstance();
         authStateListener = new FirebaseAuth.AuthStateListener() {
@@ -120,7 +124,7 @@ public class ContactListActivity extends AppCompatActivity implements GoogleApiC
            //     Intent intent2 = new Intent(ContactListActivity.this, AccountActivity.class);
 
                 // selected item
-                String selectedFromList =(String) (ContactListView.getItemAtPosition(position));
+                selectedFromList =(String) (ContactListView.getItemAtPosition(position));
 
                 intent.putExtra("text", selectedFromList);
              //   intent2.putExtra("receiver", selectedFromList);

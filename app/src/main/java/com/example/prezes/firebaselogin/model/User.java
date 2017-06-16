@@ -4,18 +4,19 @@ import com.google.firebase.auth.FirebaseUser;
 
 public  class User  {
 
-    public static String name;
+    public String name;
+    public String sender;
     public String email;
     public String userId;
-    public static String chatWith = "";
+    public String chatWith = "";
 
     public User() {
 // Default constructor required for calls to DataSnapshot.getValue(Comment.class)
     }
 
-    public User(String name, String email) {
-        this.name = name;
-        this.email = email;
+    public User(String sender, String chatWith) {
+        this.sender = sender;
+        this.chatWith = chatWith;
 
     }
     public User(String userId, String name, String email) {

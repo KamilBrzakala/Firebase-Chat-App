@@ -1,5 +1,6 @@
 package com.example.prezes.firebaselogin.SignedInUserActivity;
 
+import android.accounts.Account;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -57,6 +58,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
     private String receiver;
     private String loggedUserId;
     private String sender;
+    public ChatActivity ch;
 
 
     private ValueEventListener mUserListListener;
@@ -70,6 +72,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
     ArrayAdapter arrayAdapter;
     ListView msgListView;
     private FirebaseAuth firebaseAuth;
+    private String selectedFromList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,8 +84,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         toolbar.setTitle("Chat");
         setSupportActionBar(toolbar);
 
-        receiver = getIntent().getStringExtra("receiver");
-
+//        receiver = getIntent().getStringExtra("receiver");
 
         //Add new message button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.NewMessageButton);
@@ -106,7 +108,9 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         sender = usernameFromEmail(loggedUserId);
 
         //populating list of users
-      //  addEventFirebaseListener(currentUser);
+        addEventFirebaseListener();
+//        displayChatMessages();
+
 
         //clicking specific user from list
         onClickListener(msgListView);
@@ -140,7 +144,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                 .addApi(Auth.GOOGLE_SIGN_IN_API)
                 .build();
 
-  //      displayChatMessages();
+
 //
 //        if(usernameList.isEmpty()){
 //            noUsersText.setVisibility(View.VISIBLE);
@@ -167,8 +171,17 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-                intent.putExtra("userName", usernameList.get(position));
+//                Intent intent = new Intent(AccountActivity.this, ChatActivity.class);
+//                intent.putExtra("userName", usernameList.get(position));
+//                startActivity(intent);
+
+                Intent intent = new Intent(AccountActivity.this, ChatActivity.class);
+
+                // selected item
+                selectedFromList =(String) (msgListView.getItemAtPosition(position));
+
+                intent.putExtra("text", selectedFromList);
+
                 startActivity(intent);
 
             }
@@ -179,13 +192,17 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
     private void displayChatMessages() {
 
         adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class,
-                R.layout.activity_account, FirebaseDatabase.getInstance().getReference().child("messages").child(sender+"_"+receiver)) {
+                R.layout.chat_list, FirebaseDatabase.getInstance().getReference().child("messages").child(sender+"_bzykson")) {
             @Override
             protected void populateView(View v, ChatMessage model, int position) {
 
-                TextView noUsersText = (TextView) v.findViewById(R.id.noUsersText);
-                noUsersText.setText(model.getReceiver());
-
+                TextView user = (TextView) v.findViewById(R.id.chat_user);
+                user.setText(model.getReceiver());
+//                if(sender.equals(loggedUserId)){
+//                    user.setText(model.getReceiver());
+//                } else {
+//                    user.setText(model.getSender());
+//                }
 
             }
         };
@@ -194,32 +211,32 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    private void addEventFirebaseListener(final FirebaseUser currentUser){
+    private void addEventFirebaseListener(/*final FirebaseUser currentUser*/){
 
         progressBar = (ProgressBar) findViewById(R.id.circular_progress);
         progressBar.setVisibility(View.VISIBLE);
 
-        myRef.child("users").addValueEventListener(new ValueEventListener() {
+        myRef.child(sender).addValueEventListener(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                HashMap<String, Object> users = (HashMap<String, Object>) dataSnapshot.getValue();
+                HashMap<String, Object> messages = (HashMap<String, Object>) dataSnapshot.getValue();
 
                 if(usernameList.size() > 0){
                     usernameList.clear();
                 }
 
-                    for(Object user : users.values()) {
+                    for(Object user : messages.values()) {
                         HashMap<String, Object> userMap = (HashMap<String, Object>) user;
 
-                        String userName = userMap.get("name").toString();
-                        String userID = userMap.get("userId").toString();
-                        String loggedUserId = currentUser.getUid();
+                        String userName = userMap.get("chatWith").toString();
+                        String userID = userMap.get("sender").toString();
+//                        String loggedUserId = currentUser.getUid();
 
-                        if(!userID.equals(loggedUserId)){
+//                        if(!userID.equals(sender)){
                             usernameList.add(userName);
-                        }
+//                        }
                     }
 
                 progressBar.setVisibility(View.INVISIBLE);
