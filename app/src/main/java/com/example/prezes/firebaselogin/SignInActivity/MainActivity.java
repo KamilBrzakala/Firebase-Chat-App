@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
-                Toast.makeText(MainActivity.this, "Poszło", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Logged In", Toast.LENGTH_SHORT).show();
 //                Toast.makeText(this,
 //                        "Welcome " + FirebaseAuth.getInstance()
 //                                .getCurrentUser()
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // [START_EXCLUDE]
                // updateUI(null);
                 // [END_EXCLUDE]
-                Toast.makeText(MainActivity.this, "Coś nie poszło", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Please check internet connection.", Toast.LENGTH_SHORT).show();
 
             }
         }

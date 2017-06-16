@@ -43,6 +43,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static com.example.prezes.firebaselogin.R.layout.activity_account;
 
@@ -109,7 +110,6 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
         //populating list of users
         addEventFirebaseListener();
-//        displayChatMessages();
 
 
         //clicking specific user from list
@@ -132,7 +132,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                             "Welcome " + FirebaseAuth.getInstance()
                                     .getCurrentUser()
                                     .getDisplayName(),
-                            Toast.LENGTH_LONG)
+                            Toast.LENGTH_SHORT)
                             .show();
 
                 }
@@ -145,15 +145,16 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                 .build();
 
 
+
+//        if(!usernameList.isEmpty()){
 //
-//        if(usernameList.isEmpty()){
-//            noUsersText.setVisibility(View.VISIBLE);
-//            msgListView.setVisibility(View.GONE);
-//        }
-//        else{
 //            noUsersText.setVisibility(View.GONE);
 //            msgListView.setVisibility(View.VISIBLE);
-//            msgListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, usernameList));
+//        }
+//        else{
+//            noUsersText.setVisibility(View.VISIBLE);
+//            msgListView.setVisibility(View.GONE);
+////            msgListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, usernameList));
 //        }
 
     }
@@ -171,10 +172,6 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-//                Intent intent = new Intent(AccountActivity.this, ChatActivity.class);
-//                intent.putExtra("userName", usernameList.get(position));
-//                startActivity(intent);
-
                 Intent intent = new Intent(AccountActivity.this, ChatActivity.class);
 
                 // selected item
@@ -189,29 +186,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    private void displayChatMessages() {
-
-        adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class,
-                R.layout.chat_list, FirebaseDatabase.getInstance().getReference().child("messages").child(sender+"_bzykson")) {
-            @Override
-            protected void populateView(View v, ChatMessage model, int position) {
-
-                TextView user = (TextView) v.findViewById(R.id.chat_user);
-                user.setText(model.getReceiver());
-//                if(sender.equals(loggedUserId)){
-//                    user.setText(model.getReceiver());
-//                } else {
-//                    user.setText(model.getSender());
-//                }
-
-            }
-        };
-
-        msgListView.setAdapter(adapter);
-
-    }
-
-    private void addEventFirebaseListener(/*final FirebaseUser currentUser*/){
+    private void addEventFirebaseListener(){
 
         progressBar = (ProgressBar) findViewById(R.id.circular_progress);
         progressBar.setVisibility(View.VISIBLE);
@@ -227,17 +202,27 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                     usernameList.clear();
                 }
 
-                    for(Object user : messages.values()) {
+                try{
+                    for (Object user : messages.values()) {
                         HashMap<String, Object> userMap = (HashMap<String, Object>) user;
 
                         String userName = userMap.get("chatWith").toString();
                         String userID = userMap.get("sender").toString();
-//                        String loggedUserId = currentUser.getUid();
 
-//                        if(!userID.equals(sender)){
-                            usernameList.add(userName);
-//                        }
+                        usernameList.add(userName);
+
+                        noUsersText.setVisibility(View.GONE);
+                        msgListView.setVisibility(View.VISIBLE);
                     }
+                } catch (Exception ex){
+                    Toast.makeText(getApplicationContext(),"No open chats.", Toast.LENGTH_LONG).show();
+                    if(usernameList.isEmpty()){
+
+            noUsersText.setVisibility(View.VISIBLE);
+            msgListView.setVisibility(View.GONE);
+        }
+
+                }
 
                 progressBar.setVisibility(View.INVISIBLE);
 
