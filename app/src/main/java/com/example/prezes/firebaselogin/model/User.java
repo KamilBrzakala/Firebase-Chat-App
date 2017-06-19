@@ -25,6 +25,10 @@ public  class User  {
         this.userId = userId;
     }
 
+    public String getChatWith() { return chatWith; }
+
+    public void setChatWith(String chatWith) { this.chatWith = chatWith; }
+
     public String getName() {
         return name;
     }

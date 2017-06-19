@@ -90,8 +90,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     reference1.child("messages").child(sender+"_"+receiver).push().setValue(new ChatMessage(messageText,receiver, sender));
                     reference2.child("messages").child(receiver+"_"+sender).push().setValue(new ChatMessage(messageText,receiver, sender));
 
-                    reference1.child(sender).push().setValue(new User(sender, receiver));
-                    reference2.child(receiver).push().setValue(new User(receiver, sender));
+                    reference1.child("chats").child(sender).child(receiver).setValue(new User(sender, receiver));
+                    reference2.child("chats").child(receiver).child(receiver).setValue(new User(receiver, sender));
 
                     input.setText("");
 

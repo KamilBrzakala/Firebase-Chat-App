@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
-                Toast.makeText(MainActivity.this, "Logged In", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "Logged In", Toast.LENGTH_SHORT).show();
 //                Toast.makeText(this,
 //                        "Welcome " + FirebaseAuth.getInstance()
 //                                .getCurrentUser()
@@ -181,7 +181,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
+                            Toast.makeText(MainActivity.this,
+                                    "Welcome " + FirebaseAuth.getInstance()
+                                            .getCurrentUser()
+                                            .getDisplayName(),
+                                    Toast.LENGTH_SHORT)
+                                    .show();
                             FirebaseUser user = mAuth.getCurrentUser();
 //                            onAuthSuccess(user);
                         } else {

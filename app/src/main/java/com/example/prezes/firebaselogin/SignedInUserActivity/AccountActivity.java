@@ -125,15 +125,12 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
                     startActivity(new Intent(AccountActivity.this, MainActivity.class));
 
+                    Toast.makeText(getApplicationContext(), "Successfully logged out!", Toast.LENGTH_SHORT).show();
+
                 } else {
                     // User is already signed in. Therefore, display
                     // a welcome Toast
-                    Toast.makeText(AccountActivity.this,
-                            "Welcome " + FirebaseAuth.getInstance()
-                                    .getCurrentUser()
-                                    .getDisplayName(),
-                            Toast.LENGTH_SHORT)
-                            .show();
+
 
                 }
             }
@@ -191,7 +188,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         progressBar = (ProgressBar) findViewById(R.id.circular_progress);
         progressBar.setVisibility(View.VISIBLE);
 
-        myRef.child(sender).addValueEventListener(new ValueEventListener() {
+        myRef.child("chats").child(sender).addValueEventListener(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -209,18 +206,21 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                         String userName = userMap.get("chatWith").toString();
                         String userID = userMap.get("sender").toString();
 
-                        usernameList.add(userName);
+                        //if(!userName.equals(sender)){
+                            usernameList.add(userName);
+                        //}
 
-                        noUsersText.setVisibility(View.GONE);
-                        msgListView.setVisibility(View.VISIBLE);
+
+//                        noUsersText.setVisibility(View.GONE);
+//                        msgListView.setVisibility(View.VISIBLE);
                     }
                 } catch (Exception ex){
                     Toast.makeText(getApplicationContext(),"No open chats.", Toast.LENGTH_LONG).show();
-                    if(usernameList.isEmpty()){
-
-            noUsersText.setVisibility(View.VISIBLE);
-            msgListView.setVisibility(View.GONE);
-        }
+//                    if(usernameList.isEmpty()){
+//
+////            noUsersText.setVisibility(View.VISIBLE);
+////            msgListView.setVisibility(View.GONE);
+//        }
 
                 }
 
@@ -234,7 +234,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+//                Toast.makeText(getApplicationContext(), "onCancelled" + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
