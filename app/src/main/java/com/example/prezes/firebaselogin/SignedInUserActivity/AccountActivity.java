@@ -43,9 +43,12 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
 import static com.example.prezes.firebaselogin.R.layout.activity_account;
+import static com.example.prezes.firebaselogin.R.layout.com_facebook_activity_layout;
 
 public class AccountActivity extends AppCompatActivity implements View.OnClickListener,GoogleApiClient.OnConnectionFailedListener {
 
@@ -69,6 +72,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
     FirebaseDatabase firebaseDatabase;
 
     List<String> usernameList = new ArrayList<>();
+    Set<String> names = new TreeSet<>();
     private FirebaseListAdapter<ChatMessage> adapter;
     ArrayAdapter arrayAdapter;
     ListView msgListView;
@@ -188,14 +192,15 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         progressBar = (ProgressBar) findViewById(R.id.circular_progress);
         progressBar.setVisibility(View.VISIBLE);
 
+
         myRef.child("chats").child(sender).addValueEventListener(new ValueEventListener() {
 
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+                @Override
+                public void onDataChange (DataSnapshot dataSnapshot){
 
                 HashMap<String, Object> messages = (HashMap<String, Object>) dataSnapshot.getValue();
 
-                if(usernameList.size() > 0){
+                if (usernameList.size() > 0) {
                     usernameList.clear();
                 }
 
@@ -204,23 +209,13 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                         HashMap<String, Object> userMap = (HashMap<String, Object>) user;
 
                         String userName = userMap.get("chatWith").toString();
-                        String userID = userMap.get("sender").toString();
+                        System.out.println("lista " + userName);
 
-                        //if(!userName.equals(sender)){
                             usernameList.add(userName);
-                        //}
 
-
-//                        noUsersText.setVisibility(View.GONE);
-//                        msgListView.setVisibility(View.VISIBLE);
                     }
                 } catch (Exception ex){
                     Toast.makeText(getApplicationContext(),"No open chats.", Toast.LENGTH_LONG).show();
-//                    if(usernameList.isEmpty()){
-//
-////            noUsersText.setVisibility(View.VISIBLE);
-////            msgListView.setVisibility(View.GONE);
-//        }
 
                 }
 
@@ -231,6 +226,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                 arrayAdapter.notifyDataSetChanged();
 
             }
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
