@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -26,17 +27,24 @@ import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
 
     LinearLayout layout;
-    FloatingActionButton sendButton;
+    RelativeLayout layout_2;
+    ImageView sendButtonn;
+    EditText messageArea;
+
+  //  FloatingActionButton sendButton;
     EditText input;
     ScrollView scrollView;
     private DatabaseReference reference1, reference2;
@@ -59,12 +67,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_chat);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         receiver = getIntent().getStringExtra("text");
-        toolbar.setTitle(receiver);
+//        toolbar.setTitle(receiver);
         setSupportActionBar(toolbar);
 
-        listOfMessages = (ListView) findViewById(R.id.list_of_messages);
-        sendButton = (FloatingActionButton)findViewById(R.id.fab);
-        input = (EditText)findViewById(R.id.input);
+        layout = (LinearLayout) findViewById(R.id.layout1);
+        layout_2 = (RelativeLayout)findViewById(R.id.layout2);
+       // sendButtonn = (ImageView)findViewById(R.id.sendButton);
+        sendButtonn = (ImageView) findViewById(R.id.sendButton);
+        messageArea = (EditText)findViewById(R.id.messageArea);
         scrollView = (ScrollView)findViewById(R.id.scrollView);
 
         FirebaseApp.initializeApp(this);
@@ -77,13 +87,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         sender = usernameFromEmail(currentUser.getEmail());
 
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true); // uncomment if you want to use displayChatMessages2();
 
 
-        sendButton.setOnClickListener(new View.OnClickListener() {
+        sendButtonn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String messageText = input.getText().toString();
+                String messageText = messageArea.getText().toString();
 
                 if(!messageText.equals("")){
 
@@ -93,7 +103,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     reference1.child("chats").child(sender).child(receiver).setValue(new User(sender, receiver));
                     reference2.child("chats").child(receiver).child(sender).setValue(new User(receiver, sender));
 
-                    input.setText("");
+                    messageArea.setText("");
 
                 }
             }
@@ -102,105 +112,90 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         displayChatMessages();
 
 
-//        reference1.child("message").addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                //Map map = dataSnapshot.getValue(Map.class);
-////                Map<String, String> map = (Map<String, String>) dataSnapshot.getValue();
-////                String message = map.get("message").toString();
-////                String userName = map.get("user").toString();
-////
-////                if(userName.equals(User.name)){
-////                    addMessageBox("You:-\n" + message, 1);
-////                } else {
-////                    addMessageBox(User.chatWith  + ":-\n" + message, 2);
-////                }
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-
     }
 
     private void displayChatMessages() {
-//        ListView listOfMessages = (ListView) findViewById(R.id.list_of_messages);
-
-        adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class,
-                R.layout.message_area, FirebaseDatabase.getInstance().getReference().child("messages").child(sender+"_"+receiver)) {
+        reference1.child("messages").child(sender+"_"+receiver).addChildEventListener(new ChildEventListener() {
             @Override
-            protected void populateView(View v, ChatMessage model, int position) {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-              //  if((sender.equals(model.getSender()) && (receiver.equals(model.getReceiver())))
-//                        (model.getSender().equals(sender) && model.getReceiver().equals(sender)) ||
-//                        (model.getSender().equals(sender) && model.getReceiver().equals(receiver))
-                     //   ) {
-                    // Get references to the views of message.xml
-                    TextView messageText = (TextView) v.findViewById(R.id.message_text);
-                    TextView messageUser = (TextView) v.findViewById(R.id.message_user);
-                    TextView messageTime = (TextView) v.findViewById(R.id.message_time);
+                Map<String, String> map = (Map<String, String>) dataSnapshot.getValue();
+                String message = map.get("messageText").toString();
+                String userName = map.get("receiver").toString();
 
-                    // Set their text
-                    messageText.setText(model.getMessageText());
-
-                    if(model.getSender().equals(sender)){
-                        messageUser.setText("You");
-                    } else {
-                        messageUser.setText(model.getSender());
-                    }
-
-
-                    // Format the date before showing it
-                    messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
-                            model.getMessageTime()));
-              //  }
+                if(map.get("sender").equals(sender)){
+                    addMessageBox("You:-\n" + message, 1);
+                } else {
+                    addMessageBox(map.get("receiver")  + ":-\n" + message, 2);
+                }
             }
-        };
 
-        listOfMessages.setAdapter(adapter);
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-//        adapter.registerDataSetObserver(new DataSetObserver() {
-//            @Override
-//            public void onChanged() {
-//                super.onChanged();
-//                listOfMessages.setSelection(adapter.getCount() - 1);
-//            }
-//        });
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
+
+//    private void displayChatMessages2() {
+//
+//        adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class,
+//                R.layout.message_area, FirebaseDatabase.getInstance().getReference().child("messages").child(sender+"_"+receiver)) {
+//            @Override
+//            protected void populateView(View v, ChatMessage model, int position) {
+//
+//              //  if((sender.equals(model.getSender()) && (receiver.equals(model.getReceiver())))
+////                        (model.getSender().equals(sender) && model.getReceiver().equals(sender)) ||
+////                        (model.getSender().equals(sender) && model.getReceiver().equals(receiver))
+//                     //   ) {
+//                    // Get references to the views of message.xml
+//                    TextView messageText = (TextView) v.findViewById(R.id.message_text);
+//                    TextView messageUser = (TextView) v.findViewById(R.id.message_user);
+//                    TextView messageTime = (TextView) v.findViewById(R.id.message_time);
+//
+//                    // Set their text
+//                    messageText.setText(model.getMessageText());
+//
+//                    if(model.getSender().equals(sender)){
+//                        messageUser.setText("You");
+//                    } else {
+//                        messageUser.setText(model.getSender());
+//                    }
+//
+//
+//                    // Format the date before showing it
+//                    messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
+//                            model.getMessageTime()));
+//              //  }
+//            }
+//        };
+//
+//        listOfMessages.setAdapter(adapter);
+//
+//
+//    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        adapter.cleanup();
+//        adapter.cleanup();  // uncomment if you want to use displayChatMessages2();
     }
 
-    private void showData(DataSnapshot dataSnapshot){
-
-        for(DataSnapshot ds : dataSnapshot.getChildren()){
-            ChatMessage cMessage = new ChatMessage();
-          //  cMessage.setReceiver(ds.child(receiver).getValue(ChatMessage.class).getReceiver());
-
-         //   System.out.println("receiver " + cMessage.getReceiver());
-        }
-
-    }
 
     public void addMessageBox(String message, int type){
 
@@ -211,10 +206,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         lp2.weight = 1.0f;
 
         if(type == 1){
-            lp2.gravity = Gravity.LEFT;
+            lp2.gravity = Gravity.END;
             textView.setBackgroundResource(R.drawable.bubble_in);
         } else {
-            lp2.gravity = Gravity.RIGHT;
+            lp2.gravity = Gravity.START;
             textView.setBackgroundResource(R.drawable.bubble_out);
         }
         textView.setLayoutParams(lp2);
@@ -234,8 +229,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
 
-        if (v.getId() == R.id.fab) {
-        }
+//        if (v.getId() == R.id.fab) {// uncomment if you want to use displayChatMessages2();
+//        }
 
     }
 }
